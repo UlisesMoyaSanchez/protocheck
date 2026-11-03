@@ -1,0 +1,30 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install
+        run: python -m pip install --upgrade pip && pip install ".[test]"
+      - name: Test
+        # The two parity tests against the torch originals are skipped when torch is absent.
+        run: pytest -q
+      - name: CLI smoke test
+        run: |
+          protocheck --version
+          python -m protocheck.examples.make_examples ex
+          protocheck --train-pos ex/leak/train_pos.npy --heldout-pos ex/leak/heldout_pos.npy \
+            --encoder-edges ex/leak/encoder_edges.npy --eval-neg ex/leak/eval_neg.npy \
+            --n-rows 300 --n-cols 250 && exit 1 || test $? -eq 1

@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lp-protocheck"
+version = "0.1.0"
+description = "Check a link-prediction evaluation for edge leakage, mismatched negatives, a missing model-free baseline and dead candidate columns."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{name = "Ulises Moya Sánchez"}]
+requires-python = ">=3.9"
+dependencies = ["numpy>=1.21", "scipy>=1.7", "scikit-learn>=1.0"]
+keywords = ["link prediction", "graph neural networks", "evaluation", "data leakage",
+            "negative sampling", "bioinformatics", "reproducibility"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+
+[project.scripts]
+protocheck = "protocheck.cli:entry"
+
+[project.urls]
+Homepage = "https://github.com/UlisesMoyaSanchez/protocheck"
+Issues = "https://github.com/UlisesMoyaSanchez/protocheck/issues"
+"Research repository" = "https://github.com/UlisesMoyaSanchez/microRNA_project"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

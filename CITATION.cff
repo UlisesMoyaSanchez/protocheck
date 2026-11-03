@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use protocheck, please cite it as below."
+title: "protocheck: checks for link-prediction evaluation protocols"
+type: software
+authors:
+  - family-names: "Moya Sánchez"
+    given-names: "Ulises"
+version: 0.1.0
+date-released: 2026-11-03
+license: MIT
+repository-code: "https://github.com/UlisesMoyaSanchez/protocheck"
