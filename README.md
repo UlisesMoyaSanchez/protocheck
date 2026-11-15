@@ -94,7 +94,10 @@ numbers it was decided on. **Read the numbers, not only the status word:** the t
 - `dead_candidates` judges the evaluation negatives you supply. A padded matrix scored with
   degree-matched negatives that avoid the empty columns is reported as `info`, not `warn`.
 - The margin is computed against a floor that sees **the same edges your encoder saw**, so
-  a leaked evaluation is compared with an equally leaked heuristic.
+  a leaked evaluation is compared with an equally leaked heuristic. Under leakage that floor
+  also includes `input_echo`, which simply hands the encoder's input back (a pair scores 1 if
+  it is an input edge), and the margin is reported as `warn` at best: a margin over a leaked
+  floor is not evidence of learning. On a leak-free set-up `input_echo` is not computed.
 
 **Exit status:** `0` clean, `1` a check failed (`--fail-on-warn` also fails on warnings),
 `2` usage error, `3` nothing failed but edge leakage could not be checked because no encoder
@@ -105,7 +108,11 @@ non-zero status.
 
 - Leakage that does not pass through exact edges, such as node features computed from
   held-out labels (e.g. a degree computed on the full matrix), is not detected. The scope note
-  is printed in every report.
+  is printed in every report. A published case: NIMGSA's miRNA similarity graph is fixed across
+  folds and mostly a kernel of the full association matrix, so held-out miRNAs reach the model
+  through their features. With its held-out rows scored alone, every edge check passes, yet
+  recomputing the similarity without those rows removes 6.5 of the model's 6.9 AUROC points
+  over the floor.
 - It takes the supplied files as given: if `encoder_edges` is not what your code really feeds
   the encoder, it can report `ok` wrongly.
 - It cannot tell a correct sampler with a different seed from a matched one, and it does not
@@ -116,7 +123,7 @@ non-zero status.
 
 ## Validation
 
-- `pytest` runs 24 tests: each synthetic example triggers its own check, inputs that are
+- `pytest` runs 28 tests: each synthetic example triggers its own check, inputs that are
   missing are reported as `unchecked`, leakage through reverse relations and undirected edges is
   caught, small clean test sets are not flagged, and the scorers reproduce the reference
   implementations (the two parity tests run when torch is installed).
@@ -128,6 +135,8 @@ non-zero status.
 - An independent audit stress-tested it with synthetic cases built to break it and found no
   leaked set reported as clean once the encoder's edges were supplied. Its other findings are
   fixed in 0.1.0 (see `CHANGELOG.md`).
+- On two published papers' own evaluations (MGCNSS's released folds; NIMGSA's code, rerun) it
+  reports the leak each one has; on NIMGSA it also shows what it cannot see (above).
 
 These show that the implementation does what it says; they do not show that the thresholds
 are optimal.
